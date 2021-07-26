@@ -50,6 +50,27 @@ struct ilist {
 };
 
 
+
+
+
+/****** TO DO  *********************************************
+*   xxxxxxxxxxx
+*
+*   Parameters :
+*
+*   Return :
+*
+*   Side effects :
+*
+*****************************************************************************/
+int count_nbr_inst(char* filename);
+
+
+
+
+
+
+
 /****** create_instruction_list *********************************************
 *   Create a dynamic array of instructions
 *       
@@ -80,7 +101,7 @@ struct ilist* create_inst_list(int initial_size);
 *           if the list is full, enough memory for doubling the size of the
 *           list is allocated.
 *****************************************************************************/
-int add_inst(struct ilist* list, char* text);
+int add_inst(struct ilist* list, char* text, const int exec_cycles[]);
 
 
 /****** print_isnt **********************************************************
@@ -96,7 +117,7 @@ int add_inst(struct ilist* list, char* text);
 *   Side effects : 
 *           a line of output is sent to the terminal
 *****************************************************************************/
-void print_inst(struct instruction* inst);
+void print_inst(struct instruction* inst, FILE * ptr_output_file);
 
 
 /****** inst_details ********************************************************

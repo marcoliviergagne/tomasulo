@@ -91,7 +91,7 @@ static struct station _init_station(char* name, enum opclasses type) {
 }
 
 
-void print_station(struct station* st) {
+void print_station(struct station* st, FILE* ptr_output_file) {
 	char* busy = (st->busy == true) ? "yes" : "no";
 	char* op = (st->busy == true) ? st->op->name : "";
 	char* vj = (st->vj != NULL) ? st->vj : "";
@@ -99,6 +99,9 @@ void print_station(struct station* st) {
 	char* qj = (st->qj != NULL) ? st->qj : "";
 	char* qk = (st->qk != NULL) ? st->qk : "";
 
-	printf("|%9s |%7s |%8s |%8s |%8s |%8s |%8s |\n", 
+	fprintf(ptr_output_file,"|%9s |%7s |%8s |%8s |%8s |%8s |%8s |\n",
 			st->name, busy, op, vj, vk, qj, qk);
+
+    printf("|%9s |%7s |%8s |%8s |%8s |%8s |%8s |\n",
+            st->name, busy, op, vj, vk, qj, qk);
 }

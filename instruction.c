@@ -25,7 +25,7 @@
 #include "instruction.h"
 
 static void _grow(struct ilist* list);
-static int _decode(struct ilist* list, int pos, char* text);
+static int _decode(struct ilist* list, int pos, char* text, const int exec_cycles[]);
 static int _process_loadstore(struct instruction* inst, char* elem, char* text);
 static int _assign_register(int* regid, char* elem);
 static int _copy_inst_string(struct instruction* inst, char* text);
@@ -38,7 +38,26 @@ const char* mnemonics[] = {"ld", "sw", "addd", "subd", "muld", "divd"};
 
 // array of ints for execution time
 // also ordered the same as enum opcode
-const int exec_cycles[] = { 1,    1,    2    ,  2    ,  4     ,  8};
+
+// This function was inspired from : https://www.geeksforgeeks.org/c-program-count-number-lines-file/
+int count_nbr_inst(char* filename)
+{
+    int count = 0;
+    char c;
+
+    FILE *ptr_file = fopen(filename, "r");
+
+    if(ptr_file == NULL)
+        return -9;
+
+    for (c = getc(ptr_file); c != EOF; c = getc(ptr_file))
+    {
+        if (c == '\n')
+            count = count + 1;
+    }
+
+        return count+1;
+}
 
 
 void inst_details(struct instruction* inst) {
@@ -51,9 +70,13 @@ void inst_details(struct instruction* inst) {
 }
 
 
-void print_inst(struct instruction* inst) {
-    printf("|%20s |%10d |%10d |%10d |%10d |\n",
+void print_inst(struct instruction* inst, FILE * ptr_output_file) {
+    fprintf(ptr_output_file,"|%20s |%10d |%10d |%10d |%10d |\n",
         inst->text, inst->issue, inst->execute, inst->writeback, inst->retired);
+
+    printf("|%20s |%10d |%10d |%10d |%10d |\n",
+            inst->text, inst->issue, inst->execute, inst->writeback, inst->retired);
+
 }
 
 
@@ -73,7 +96,7 @@ struct ilist* create_inst_list(int initial_size) {
 }
 
 
-int add_inst(struct ilist* list, char* text) {
+int add_inst(struct ilist* list, char* text, const int exec_cycles[]) {
     if (list->occupied == list->size) {
         _grow(list);
     }
@@ -86,7 +109,7 @@ int add_inst(struct ilist* list, char* text) {
     // this struct initialization method requires C99
     list->data[list->occupied] = (struct instruction){0};
 
-    int retval = _decode(list, list->occupied, text);
+    int retval = _decode(list, list->occupied, text, exec_cycles);
     if (!retval) {
         list->occupied++;
     }
@@ -108,7 +131,7 @@ static void _grow(struct ilist* list) {
 }
 
 
-static int _decode(struct ilist* list, int pos, char* text) { 
+static int _decode(struct ilist* list, int pos, char* text, const int exec_cycles[]) {
     struct instruction* inst = &list->data[pos];
 
     char* elem = malloc(strlen(text) + 1);
@@ -122,6 +145,7 @@ static int _decode(struct ilist* list, int pos, char* text) {
                 inst->op = i;
                 inst->name = (char *) mnemonics[i];
                 inst->remaining = exec_cycles[i];
+
                 switch (i) {
                     case ld:
                     case sw:

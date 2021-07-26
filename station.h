@@ -91,6 +91,6 @@ int add_station(struct slist* list, char* name, enum opclasses type);
 *   Side effects : 
 *           a line of output is sent to the terminal
 *****************************************************************************/
-void print_station(struct station* st);
+void print_station(struct station* st, FILE* ptr_output_file);
 
 #endif
